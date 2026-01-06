@@ -1,0 +1,18 @@
+services:
+  web-app:           # 1. Seviye (Servis adı)
+    build: .         # 2. Seviye (2 boşluk içerde)
+    ports:           # 2. Seviye
+      - "8080:5000"
+    environment:     # 2. Seviye (Burada olmalı!)
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+    depends_on:      # 2. Seviye
+      - redis-server
+
+  redis-server:      # 1. Seviye
+    image: "redis:alpine"
+    volumes:
+      - redis_data:/data
+
+volumes:             # 0. Seviye (En solda)
+  redis_data:
