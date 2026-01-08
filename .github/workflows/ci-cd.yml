@@ -1,25 +1,26 @@
-name: Docker Build Test
+name: Login to Docker Hub
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  build-and-test:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Kodu bilgisayardan çek
-      uses: actions/checkout@v3
+      - name: Kodu bilgisayardan çek
+        uses: actions/checkout@v4
 
-    - name: Docker İmajını İnşa Et
-      run: |
-        docker build -t cihan-web-app .
-        echo "İmaj başarıyla build edildi!"
+      - name: Docker Hub'a Giriş Yap
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-    - name: Konteyneri Test Et
-      run: |
-        docker run -d --name test-container cihan-web-app
-        sleep 5
-        docker ps | grep cihan-web-app
-        echo "Konteyner başarıyla ayağa kalktı!"
+      - name: Docker İmajını İnşa Et ve Gönder
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: chainsahin/devops_project:latest
