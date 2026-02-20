@@ -1,0 +1,48 @@
+name: DevOps & Cloud CI-CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ] # Kod ana kola (main) atıldığında çalışır
+
+jobs:
+  # 1. AŞAMA: Test ve Docker Hub'a Gönderme (CI)
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodu Çek
+        uses: actions/checkout@v3
+
+      - name: Docker Hub'a Login Ol
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker İmajını Oluştur ve Pushla
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/benim-devops-projem:latest
+
+  # 2. AŞAMA: Sunucuya Otomatik Dağıtım (CD)
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push # Önce imajın Docker Hub'a gitmesini bekle
+    steps:
+      - name: Sunucuya SSH ile Bağlan ve Güncelle
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            # Docker Hub'daki en güncel imajı çek
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/benim-devops-projem:latest
+            
+            # Eski konteyneri durdur ve temizle (Hata verirse geçmesi için || true)
+            docker stop web-uygulamam || true
+            docker rm web-uygulamam || true
+            
+            # Yeni konteyneri ayağa kaldır
+            docker run -d -p 80:80 --name web-uygulamam ${{ secrets.DOCKERHUB_USERNAME }}/benim-devops-projem:latest
