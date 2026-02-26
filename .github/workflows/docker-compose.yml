@@ -9,7 +9,7 @@ services:
     depends_on:
       - redis-server
 
-  # Yeşil Sürüm (Yeni Gelecek) 🟢
+  # Yeşil Sürüm (Yeni Gelecek/Test) 🟢
   web-app-green:
     image: ${DOCKERHUB_USERNAME}/devops_project:${GITHUB_RUN_NUMBER}
     ports:
@@ -36,6 +36,5 @@ services:
     volumes:
       - redis_data:/data
 
-# Verilerin kalıcı olması için global volume tanımı
 volumes:
   redis_data:
