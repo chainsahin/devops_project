@@ -1,0 +1,18 @@
+services:
+  web-app-blue:
+    image: ${DOCKERHUB_USERNAME}/devops_project:latest
+    ports:
+      - "____:5000" # Mavi kapı 🔵
+    environment:
+      - REDIS_HOST=redis-server
+    depends_on:
+      - redis-server
+
+  web-app-green:
+    image: ${DOCKERHUB_USERNAME}/devops_project:${GITHUB_RUN_NUMBER}
+    ports:
+      - "____:5000" # Yeşil kapı 🟢
+    environment:
+      - REDIS_HOST=redis-server
+    depends_on:
+      - redis-server
