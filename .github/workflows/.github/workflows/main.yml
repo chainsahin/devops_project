@@ -23,7 +23,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/benim-devops-projem:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/devops_project:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/devops_project:${{ github.run_number }}
 
   # 2. AŞAMA: Sunucuya Otomatik Dağıtım (CD)
   deploy:
