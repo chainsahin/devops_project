@@ -1,12 +1,11 @@
-services:
-  web-app:           # 1. Seviye (Servis adı)
-    build: .         # 2. Seviye (2 boşluk içerde)
-    ports:           # 2. Seviye
-      - "8080:5000"
-    environment:     # 2. Seviye (Burada olmalı!)
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-    depends_on:      # 2. Seviye
+web-app-green:
+    image: ${DOCKERHUB_USERNAME}/devops_project:${GITHUB_RUN_NUMBER} # Yeni sürüm etiketi 🏷️
+    ports:
+      - "____:5000" # Yeni kapı numarası 🚪
+    environment:
+      - REDIS_HOST=redis-server
+      - REDIS_PORT=6379
+    depends_on:
       - redis-server
 
   redis-server:      # 1. Seviye
