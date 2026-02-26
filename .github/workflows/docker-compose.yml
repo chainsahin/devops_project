@@ -1,18 +1,35 @@
 services:
+  # Mavi Sürüm (Mevcut Canlı) 🔵
   web-app-blue:
-    image: ${DOCKERHUB_USERNAME}/devops_project:latest
+    image: ${{ secrets.DOCKERHUB_USERNAME }}/devops_project:latest
     ports:
-      - "____:5000" # Mavi kapı 🔵
+      - "8081:5000"
     environment:
       - REDIS_HOST=redis-server
     depends_on:
       - redis-server
 
+  # Yeşil Sürüm (Yeni Gelecek) 🟢
   web-app-green:
-    image: ${DOCKERHUB_USERNAME}/devops_project:${GITHUB_RUN_NUMBER}
+    image: ${{ secrets.DOCKERHUB_USERNAME }}/devops_project:${{ github.run_number }}
     ports:
-      - "____:5000" # Yeşil kapı 🟢
+      - "8082:5000"
     environment:
       - REDIS_HOST=redis-server
     depends_on:
       - redis-server
+
+  # Trafik Polisi 👮‍♂️
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - web-app-blue
+      - web-app-green
+
+  # Veritabanı 🗄️
+  redis-server:
+    image: "redis:alpine"
