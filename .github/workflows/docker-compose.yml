@@ -1,7 +1,7 @@
 services:
   # Mavi Sürüm (Mevcut Canlı) 🔵
   web-app-blue:
-    image: ${{ secrets.DOCKERHUB_USERNAME }}/devops_project:latest
+    image: ${DOCKERHUB_USERNAME}/devops_project:latest
     ports:
       - "8081:5000"
     environment:
@@ -11,7 +11,7 @@ services:
 
   # Yeşil Sürüm (Yeni Gelecek) 🟢
   web-app-green:
-    image: ${{ secrets.DOCKERHUB_USERNAME }}/devops_project:${{ github.run_number }}
+    image: ${DOCKERHUB_USERNAME}/devops_project:${GITHUB_RUN_NUMBER}
     ports:
       - "8082:5000"
     environment:
@@ -33,3 +33,9 @@ services:
   # Veritabanı 🗄️
   redis-server:
     image: "redis:alpine"
+    volumes:
+      - redis_data:/data
+
+# Verilerin kalıcı olması için global volume tanımı
+volumes:
+  redis_data:
