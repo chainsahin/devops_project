@@ -1,26 +1,29 @@
-name: Login to Docker Hub
+import time
+import redis
+from flask import Flask
 
-on:
-  push:
-    branches: [ "main" ]
+# 1. Önce Flask uygulamasını tanımlıyoruz
+app = Flask(__name__)
 
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
+# 2. Redis bağlantısını kuruyoruz (host='redis' olmasına dikkat!)
+cache = redis.Redis(host='redis', port=6379)
 
-    steps:
-      - name: Kodu bilgisayardan çek
-        uses: actions/checkout@v4
+def get_hit_count():
+    retries = 5
+    while True:
+        try:
+            return cache.incr('hits')
+        except redis.exceptions.ConnectionError as exc:
+            if retries == 0:
+                raise exc
+            retries -= 1
+            time.sleep(0.5)
 
-      - name: Docker Hub'a Giriş Yap
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+@app.route('/')
+def hello():
+    count = get_hit_count()
+    return f'Selam! Bu sayfa {count} kez görüntülendi.\n'
 
-      - name: Docker İmajını İnşa Et ve Gönder
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: chainsahin/devops_project:latest
+# 3. EN SONDA uygulamayı çalıştırıyoruz
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000, debug=True)
