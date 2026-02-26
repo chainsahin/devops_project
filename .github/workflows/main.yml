@@ -2,10 +2,9 @@ name: DevOps & Cloud CI-CD Pipeline
 
 on:
   push:
-    branches: [ "main" ] # Kod ana kola (main) atıldığında çalışır
+    branches: [ "main" ]
 
 jobs:
-  # 1. AŞAMA: Test ve Docker Hub'a Gönderme (CI)
   build-and-push:
     runs-on: ubuntu-latest
     steps:
@@ -27,10 +26,9 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/devops_project:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/devops_project:${{ github.run_number }}
 
-  # 2. AŞAMA: Sunucuya Otomatik Dağıtım (CD)
   deploy:
     runs-on: ubuntu-latest
-    needs: build-and-push # Önce imajın Docker Hub'a gitmesini bekle
+    needs: build-and-push
     steps:
       - name: Sunucuya SSH ile Bağlan ve Güncelle
         uses: appleboy/ssh-action@v1.0.3
@@ -39,12 +37,13 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            # Docker Hub'daki en güncel imajı çek
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/benim-devops-projem:latest
+            # Değişkenleri sunucuya aktar
+            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            export GITHUB_RUN_NUMBER=${{ github.run_number }}
             
-            # Eski konteyneri durdur ve temizle (Hata verirse geçmesi için || true)
-            docker stop web-uygulamam || true
-            docker rm web-uygulamam || true
+            # Proje klasörüne git (Burayı kendi klasör yolunla güncelle!)
+            cd /home/${{ secrets.SERVER_USER }}/proje-klasoru
             
-            # Yeni konteyneri ayağa kaldır
-            docker run -d -p 80:80 --name web-uygulamam ${{ secrets.DOCKERHUB_USERNAME }}/benim-devops-projem:latest
+            # En yeni imajları çek ve sistemi başlat
+            docker-compose pull
+            docker-compose up -d
