@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  # 1. BÖLÜM: Docker Hub'a Gönderim
+  # 1. ADIM: Docker İmajını İnşa Etme ve Docker Hub'a Gönderme
   build-and-push:
     runs-on: ubuntu-latest
     steps:
@@ -27,7 +27,7 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/devops_project:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/devops_project:${{ github.run_number }}
 
-  # 2. BÖLÜM: Sunucuya Dağıtım (Deploy)
+  # 2. ADIM: Sunucuya Dağıtım (Deploy)
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
@@ -35,6 +35,7 @@ jobs:
       - name: Kodu Çek
         uses: actions/checkout@v4
 
+      # docker-compose.yml dosyasını sunucuya kopyalar
       - name: Docker Compose Dosyasını Sunucuya Gönder (SCP)
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -44,6 +45,7 @@ jobs:
           source: "docker-compose.yml"
           target: "/root/devops_project"
 
+      # Sunucuya bağlanıp konteynerları günceller
       - name: Sunucuya SSH ile Bağlan ve Güncelle
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -51,7 +53,14 @@ jobs:
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            # Proje klasörüne git
             cd /root/devops_project
+            
+            # Docker Hub kullanıcı adını değişken olarak tanımla
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            
+            # En yeni imajı çek
             docker compose pull
+            
+            # Sistemi arka planda yeniden başlat
             docker compose up -d
