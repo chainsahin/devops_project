@@ -33,13 +33,15 @@ jobs:
       - name: Kodu Çek
         uses: actions/checkout@v4
 
-      - name: Docker Compose Dosyasını Sunucuya Gönder (SCP)
+      # Kritik Dosyaları (docker-compose ve nginx.conf) Sunucuya Gönder
+      - name: Dosyaları Sunucuya Gönder (SCP)
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_IP }}
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "docker-compose.yml"
+          # Hem docker-compose hem de nginx.conf dosyasını gönderiyoruz
+          source: "docker-compose.yml,nginx.conf"
           target: "/root/devops_project"
 
       - name: Sunucuya SSH ile Bağlan ve Güncelle
@@ -48,14 +50,15 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          # Değişkenleri 'envs' kısmında tanımlayarak sunucuya güvenli şekilde aktarıyoruz
           envs: GITHUB_RUN_NUMBER,DOCKERHUB_USERNAME
           script: |
             cd /root/devops_project
             
-            # Değişkenlerin aktarıldığından emin olalım
+            # Eğer Docker daha önce yanlışlıkla nginx.conf klasörü oluşturduysa onu sil
+            if [ -d "nginx.conf" ]; then rm -rf nginx.conf; fi
+            
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
             export GITHUB_RUN_NUMBER=${{ github.run_number }}
             
             docker compose pull
-            docker compose up -d
+            docker compose up -d --force-recreate
