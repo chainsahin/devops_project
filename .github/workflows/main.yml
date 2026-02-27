@@ -1,89 +1,50 @@
 name: DevOps & Cloud CI-CD Pipeline
 
-
-
 on:
-
   push:
-
     branches: [ "main" ]
 
-
-
 jobs:
-
   build-and-push:
-
     runs-on: ubuntu-latest
-
     steps:
-
       - name: Kodu Çek
-
         uses: actions/checkout@v3
 
-
-
       - name: Docker Hub'a Login Ol
-
         uses: docker/login-action@v2
-
         with:
-
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-
-
       - name: Docker İmajını Oluştur ve Pushla
-
         uses: docker/build-push-action@v4
-
         with:
-
           context: .
-
           push: true
-
           tags: |
-
             ${{ secrets.DOCKERHUB_USERNAME }}/devops_project:latest
-
             ${{ secrets.DOCKERHUB_USERNAME }}/devops_project:${{ github.run_number }}
 
-
-
   deploy:
-
     runs-on: ubuntu-latest
-
     needs: build-and-push
-
     steps:
-
       - name: Sunucuya SSH ile Bağlan ve Güncelle
-
         uses: appleboy/ssh-action@v1.0.3
-
         with:
-
           host: ${{ secrets.SERVER_IP }}
-
-          username: ${{ secrets.SERVER_USER }}
-
-          key: ${{ secrets.SERVER_SSH_KEY }}
-
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-
-            # Değişkenleri sunucuya aktar
-
-            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-
-            export GITHUB_RUN_NUMBER=${{ github.run_number }}
-
+            # Proje klasörüne git
+            cd /root/devops_project
             
-
-            # Proje klasörüne git (Burayı kendi klasör yolunla güncelle!)
-
-            cd /home/${{ secrets.SERVER_USER }}/proje-klasoru
+            # Docker Hub kullanıcı adını tanımla (Imajı çekebilmek için)
+            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            
+            # En yeni imajları çek
+            docker compose pull
+            
+            # Eski konteynerları durdur ve yenilerini ayağa kaldır
+            docker compose up -d
