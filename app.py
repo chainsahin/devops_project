@@ -6,7 +6,8 @@ from flask import Flask
 app = Flask(__name__)
 
 # 2. Redis bağlantısını kuruyoruz (host='redis' docker-compose'daki servis adıdır)
-cache = redis.Redis(host='redis', port=6379)
+# 'redis' yerine 'redis-server' yazıyoruz
+cache = redis.Redis(host='redis-server', port=6379)
 
 def get_hit_count():
     retries = 5
