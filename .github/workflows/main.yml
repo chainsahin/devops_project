@@ -34,16 +34,17 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Değişkenleri sunucuya aktar
+            # Proje klasörüne git
+            cd /root/devops_project
+            
+            # Docker Hub kullanıcı adını tanımla (Imajı çekebilmek için)
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-            export GITHUB_RUN_NUMBER=${{ github.run_number }}
             
-            # Proje klasörüne git (Burayı kendi klasör yolunla güncelle!)
-            cd /home/${{ secrets.SERVER_USER }}/proje-klasoru
+            # En yeni imajları çek
+            docker compose pull
             
-            # En yeni imajları çek ve sistemi başlat
-            docker-compose pull
-            docker-compose up -d
+            # Eski konteynerları durdur ve yenilerini ayağa kaldır
+            docker compose up -d
