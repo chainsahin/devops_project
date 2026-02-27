@@ -42,7 +42,7 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "docker-compose.yml,nginx.conf"
+          source: "docker-compose.yml,nginx.conf,Dockerfile,app.py,requirements.txt"
           target: "/root/devops_project"
 
       - name: Sunucuya SSH ile Bağlan ve Güncelle
