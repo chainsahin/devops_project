@@ -1,11 +1,11 @@
-name: DevOps & Cloud CI-CD Pipeline
+name: DevOps & Cloud CI-CD Pipeline (Recovery Mode)
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  # 1. BÖLÜM: Docker İmajını Oluşturma ve Docker Hub'a Gönderme
+  # 1. BÖLÜM: Docker İmajını Oluşturma (Bu kısım aynı kalıyor)
   build-and-push:
     runs-on: ubuntu-latest
     steps:
@@ -27,15 +27,36 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/devops_project:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/devops_project:${{ github.run_number }}
 
-  # 2. BÖLÜM: Sunucuya Akıllı Dağıtım (Deploy)
+  # 2. BÖLÜM: Sunucu Erişimi ve Şifre Kurtarma Operasyonu 🛠️
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
     steps:
+      - name: Sunucuya SSH Key ile Sız ve Ayarları Düzelt
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            echo "--- KURTARMA OPERASYONU BAŞLADI ---"
+            
+            # 1. SSH yapılandırmasında şifreyle girişi 'yes' yap
+            sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+            sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+            
+            # 2. Root kullanıcısı için şifreyi tanımla
+            echo "root:HadiYapalim123!" | sudo chpasswd
+            
+            # 3. SSH servisini yeniden başlat
+            sudo systemctl restart ssh
+            
+            echo "--- İŞLEM TAMAMLANDI: Şifre ile girişi deneyebilirsiniz ---"
+
+      # Bu adımda normal dağıtım dosyalarını da gönderelim ki sistem güncellensin
       - name: Kodu Çek
         uses: actions/checkout@v4
 
-      # docker-compose.yml ve nginx.conf dosyalarını sunucuya gönderir
       - name: Dosyaları Sunucuya Gönder (SCP)
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -45,24 +66,16 @@ jobs:
           source: "docker-compose.yml,nginx.conf,Dockerfile,app.py,requirements.txt"
           target: "/root/devops_project"
 
-      - name: Sunucuya SSH ile Bağlan ve Güncelle
+      - name: Uygulamayı Başlat
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_IP }}
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          # Robotun sunucuda değişkenleri tanımasını sağlar
           envs: GITHUB_RUN_NUMBER,DOCKERHUB_USERNAME
           script: |
             cd /root/devops_project
-            
-            # Eğer Docker yanlışlıkla nginx.conf klasörü oluşturduysa temizle
-            if [ -d "nginx.conf" ]; then rm -rf nginx.conf; fi
-            
-            # Değişkenleri sunucu ortamına aktar
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
             export GITHUB_RUN_NUMBER=${{ github.run_number }}
-            
-            # Sadece değişen imajları çek ve konteynerları güncelle
             docker compose pull
             docker compose up -d
