@@ -1,5 +1,5 @@
 services:
-  # Mavi Sürüm (Mevcut Canlı) 🔵
+  # 🔵 Mavi Sürüm (Mevcut Canlı)
   web-app-blue:
     image: ${DOCKERHUB_USERNAME}/devops_project:${GITHUB_RUN_NUMBER}
     ports:
@@ -11,7 +11,7 @@ services:
     depends_on:
       - redis-server
 
-  # Yeşil Sürüm (Yeni Gelecek/Test) 🟢
+  # 🟢 Yeşil Sürüm (Yeni Gelecek/Test)
   web-app-green:
     image: ${DOCKERHUB_USERNAME}/devops_project:${GITHUB_RUN_NUMBER}
     ports:
@@ -23,7 +23,7 @@ services:
     depends_on:
       - redis-server
 
-  # Trafik Polisi 👮‍♂️
+  # 👮‍♂️ Trafik Polisi (Load Balancer)
   nginx:
     image: nginx:latest
     ports:
@@ -34,11 +34,25 @@ services:
       - web-app-blue
       - web-app-green
 
-  # Veritabanı 🗄️
+  # 📊 Gözetleme Kulesi (Monitoring)
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+
+  # 🗄️ Veritabanı (Redis)
   redis-server:
     image: "redis:alpine"
     volumes:
       - redis_data:/data
 
+# 💾 Kalıcı Veri Alanı
 volumes:
   redis_data:
