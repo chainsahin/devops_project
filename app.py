@@ -1,12 +1,9 @@
+import os  # Sistemi okumak için ekledik
 import time
 import redis
 from flask import Flask, render_template
 
-# 1. Flask uygulamasını tanımlıyoruz
 app = Flask(__name__)
-
-# 2. Redis bağlantısını kuruyoruz (host='redis' docker-compose'daki servis adıdır)
-# 'redis' yerine 'redis-server' yazıyoruz
 cache = redis.Redis(host='redis-server', port=6379)
 
 def get_hit_count():
@@ -23,8 +20,11 @@ def get_hit_count():
 @app.route('/')
 def hello():
     count = get_hit_count()
-    # Burada hem HTML dosyasını hem de count verisini gönderiyoruz
-    return render_template('index.html', count=count)
+    # 🆔 Konteynerin rengini ve ismini ortam değişkeninden okuyoruz
+    app_color = os.environ.get('APP_COLOR', 'blue') # Varsayılan mavi
+    app_name = os.environ.get('APP_NAME', 'Bilinmeyen Konteyner')
+    
+    return render_template('index.html', count=count, color=app_color, version=app_name)
 
 # 3. Uygulamayı dış bağlantılara açık şekilde çalıştırıyoruz
 if __name__ == "__main__":
