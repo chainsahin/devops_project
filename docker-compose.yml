@@ -34,9 +34,10 @@ services:
       - web-app-blue
       - web-app-green
 
-  # 📊 Gözetleme Kulesi (Monitoring)
+# 📊 Gözetleme Kulesi (Monitoring)
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    # 'latest' yerine daha güncel ve mimariyi belirten bir sürüm kullanıyoruz
+    image: gcr.io/cadvisor/cadvisor-amd64:v0.49.1
     container_name: cadvisor
     ports:
       - "8080:8080"
