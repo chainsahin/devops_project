@@ -23,7 +23,8 @@ def get_hit_count():
 @app.route('/')
 def hello():
     count = get_hit_count()
-    return f'<h1>Selam! Bu sayfa {count} kez görüntülendi.</h1>\n'
+    # Burada hem HTML dosyasını hem de count verisini gönderiyoruz
+    return render_template('index.html', count=count)
 
 # 3. Uygulamayı dış bağlantılara açık şekilde çalıştırıyoruz
 if __name__ == "__main__":
