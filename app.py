@@ -1,6 +1,6 @@
 import time
 import redis
-from flask import Flask
+from flask import Flask, render_template
 
 # 1. Flask uygulamasını tanımlıyoruz
 app = Flask(__name__)
