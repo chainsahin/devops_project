@@ -37,7 +37,7 @@ services:
 # 📊 Gözetleme Kulesi (Monitoring)
   cadvisor:
     # 'latest' yerine daha güncel ve mimariyi belirten bir sürüm kullanıyoruz
-    image: gcr.io/cadvisor/cadvisor-amd64:v0.49.1
+    image: google/cadvisor:v0.49.1
     container_name: cadvisor
     ports:
       - "8080:8080"
