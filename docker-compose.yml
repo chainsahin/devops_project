@@ -37,7 +37,7 @@ services:
 # 📊 Gözetleme Kulesi (Monitoring)
   cadvisor:
     # 'latest' yerine daha güncel ve mimariyi belirten bir sürüm kullanıyoruz
-    image: google/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: cadvisor
     privileged: true # ⬅️ Sisteme tam erişim anahtarı verir
     ports:
