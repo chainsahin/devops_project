@@ -36,9 +36,10 @@ services:
 
   # 📊 Gözetleme Kulesi (Monitoring)
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    # Mimariyi (amd64) açıkça belirterek erişim sorununu aşmayı deniyoruz
+    image: gcr.io/cadvisor/cadvisor-amd64:v0.49.1
     container_name: cadvisor
-    privileged: true 
+    privileged: true
     ports:
       - "8080:8080"
     volumes:
