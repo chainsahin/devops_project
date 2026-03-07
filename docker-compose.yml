@@ -35,9 +35,9 @@ services:
       - web-app-green
 
   # 📊 cAdvisor (Monitoring)
-  cadvisor:
-    # 403 hatasını aşmak için v0.47.2 sürümünü kullanıyoruz
-    image: gcr.io/cadvisor/cadvisor:v0.47.2
+ cadvisor:
+    # Google (gcr.io) yerine Docker Hub'daki bu uyumlu sürümü kullanıyoruz
+    image: zcube/cadvisor:latest
     container_name: cadvisor
     privileged: true
     ports:
