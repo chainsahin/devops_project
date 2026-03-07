@@ -35,14 +35,15 @@ jobs:
       - name: Kodu Çek
         uses: actions/checkout@v4
 
-      # Gerekli tüm dosyaları sunucuya gönderir
+      # Gerekli tüm dosyaları ve 'templates' klasörünü sunucuya gönderir
       - name: Dosyaları Sunucuya Gönder (SCP)
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_IP }}
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "docker-compose.yml,nginx.conf,Dockerfile,app.py,requirements.txt"
+          # 'templates' klasörünü listeye ekledik
+          source: "docker-compose.yml,nginx.conf,Dockerfile,app.py,requirements.txt,templates"
           target: "/root/devops_project"
 
       - name: Sunucuya SSH ile Bağlan ve Güncelle
