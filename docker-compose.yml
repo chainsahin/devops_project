@@ -35,8 +35,7 @@ services:
       - web-app-green
 
   # 📊 cAdvisor (Monitoring)
- cadvisor:
-    # Google (gcr.io) yerine Docker Hub'daki bu uyumlu sürümü kullanıyoruz
+  cadvisor:
     image: zcube/cadvisor:latest
     container_name: cadvisor
     privileged: true
@@ -58,4 +57,3 @@ services:
 
 volumes:
   redis_data:
-  
