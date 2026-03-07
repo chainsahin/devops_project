@@ -1,5 +1,5 @@
 services:
-  # 🔵 Mavi Sürüm (Mevcut Canlı)
+  # 🔵 Mavi Sürüm
   web-app-blue:
     image: ${DOCKERHUB_USERNAME}/devops_project:${GITHUB_RUN_NUMBER}
     ports:
@@ -11,7 +11,7 @@ services:
     depends_on:
       - redis-server
 
-  # 🟢 Yeşil Sürüm (Yeni Gelecek/Test)
+  # 🟢 Yeşil Sürüm
   web-app-green:
     image: ${DOCKERHUB_USERNAME}/devops_project:${GITHUB_RUN_NUMBER}
     ports:
@@ -23,7 +23,7 @@ services:
     depends_on:
       - redis-server
 
-  # 👮‍♂️ Trafik Polisi (Load Balancer)
+  # 👮‍♂️ Nginx Load Balancer
   nginx:
     image: nginx:latest
     ports:
@@ -34,10 +34,10 @@ services:
       - web-app-blue
       - web-app-green
 
-  # 📊 Gözetleme Kulesi (Monitoring)
+  # 📊 cAdvisor (Monitoring)
   cadvisor:
-    # Mimariyi (amd64) açıkça belirterek erişim sorununu aşmayı deniyoruz
-    image: gcr.io/cadvisor/cadvisor-amd64:v0.49.1
+    # 403 hatasını aşmak için v0.47.2 sürümünü kullanıyoruz
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
     container_name: cadvisor
     privileged: true
     ports:
@@ -50,12 +50,11 @@ services:
       - /dev/disk/:/dev/disk:ro
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
-  # 🗄️ Veritabanı (Redis)
+  # 🗄️ Redis
   redis-server:
     image: "redis:alpine"
     volumes:
       - redis_data:/data
 
-# 💾 Kalıcı Veri Alanı
 volumes:
   redis_data:
