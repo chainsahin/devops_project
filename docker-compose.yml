@@ -34,16 +34,14 @@ services:
       - web-app-blue
       - web-app-green
 
-  # 📊 cAdvisor (Monitoring)
+  # 📊 cAdvisor (Monitoring) - EN GÜNCEL VERSİYON
   cadvisor:
-    image: zcube/cadvisor:latest
+    # ghcr.io (GitHub) üzerinden en güncel v0.49.1 sürümünü çekiyoruz
+    image: ghcr.io/google/cadvisor/cadvisor:v0.49.1
     container_name: cadvisor
     privileged: true
     ports:
       - "8080:8080"
-    environment:
-      # 🔑 KRİTİK DÜZELTME: cAdvisor'a Docker API sürümünü zorla 1.44 yaptırıyoruz
-      - DOCKER_API_VERSION=1.44
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
