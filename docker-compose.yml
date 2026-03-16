@@ -10,6 +10,8 @@ services:
       - REDIS_HOST=redis-server
     depends_on:
       - redis-server
+    networks:
+      - devops_net
 
   web-app-green:
     image: ${DOCKERHUB_USERNAME}/devops_project:${GITHUB_RUN_NUMBER}
@@ -22,6 +24,8 @@ services:
       - REDIS_HOST=redis-server
     depends_on:
       - redis-server
+    networks:
+      - devops_net
 
   nginx:
     image: nginx:latest
@@ -33,11 +37,15 @@ services:
     depends_on:
       - web-app-blue
       - web-app-green
+    networks:
+      - devops_net
 
   cadvisor:
     image: google/cadvisor:latest
     container_name: cadvisor
     privileged: true
+    ports:
+      - "8080:8080"
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
@@ -45,8 +53,9 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    networks:
+      - devops_net
 
-  # 📈 PROMETHEUS: Verileri saklayan veritabanı
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -56,8 +65,9 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
     depends_on:
       - cadvisor
+    networks:
+      - devops_net
 
-  # 🎨 GRAFANA: Verileri dashboard'a dönüştüren görselleştirme aracı
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -65,12 +75,20 @@ services:
       - "3000:3000"
     depends_on:
       - prometheus
+    networks:
+      - devops_net
 
   redis-server:
     image: "redis:alpine"
     container_name: redis-server
     volumes:
       - redis_data:/data
+    networks:
+      - devops_net
 
 volumes:
   redis_data:
+
+networks:
+  devops_net:
+    driver: bridge
