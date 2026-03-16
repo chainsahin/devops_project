@@ -34,10 +34,10 @@ services:
       - web-app-blue
       - web-app-green
 
-  # 📊 cAdvisor (Monitoring) - EN GÜNCEL VERSİYON
+  # 📊 cAdvisor (Monitoring) - Düzeltilmiş Resmi Yol
   cadvisor:
-    # ghcr.io (GitHub) üzerinden en güncel v0.49.1 sürümünü çekiyoruz
-    image: ghcr.io/google/cadvisor/cadvisor:v0.49.1
+    # Bu yol cAdvisor'ın en resmi ve en güncel yoludur
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: cadvisor
     privileged: true
     ports:
