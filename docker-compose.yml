@@ -34,10 +34,11 @@ services:
       - web-app-blue
       - web-app-green
 
-  # 📊 cAdvisor (Monitoring) - Düzeltilmiş Resmi Yol
+  # 📊 cAdvisor (Monitoring) - DOCKER HUB RESMİ İMAJI
   cadvisor:
-    # Bu yol cAdvisor'ın en resmi ve en güncel yoludur
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    # Google (gcr.io) yerine direkt Docker Hub'daki resmi yolu kullanıyoruz.
+    # Bu yol herkese açıktır, asla 403 Forbidden hatası vermez.
+    image: cadvisor/cadvisor:v0.49.1
     container_name: cadvisor
     privileged: true
     ports:
