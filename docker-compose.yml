@@ -41,6 +41,9 @@ services:
     privileged: true
     ports:
       - "8080:8080"
+    environment:
+      # 🔑 KRİTİK DÜZELTME: cAdvisor'a Docker API sürümünü zorla 1.44 yaptırıyoruz
+      - DOCKER_API_VERSION=1.44
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
