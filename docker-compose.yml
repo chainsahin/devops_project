@@ -41,7 +41,8 @@ services:
       - devops_net
 
   cadvisor:
-    image: google/cadvisor:latest
+    # 🚀 KRİTİK DEĞİŞİKLİK: Modern sistemler (cgroup v2) için yamalanmış imaj
+    image: zcube/cadvisor:latest
     container_name: cadvisor
     privileged: true
     devices:
@@ -52,9 +53,10 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
     networks:
       - devops_net
-    restart: always # 👈 Kapanırsa tekrar açılması için
+    restart: always
 
   prometheus:
     image: prom/prometheus:latest
