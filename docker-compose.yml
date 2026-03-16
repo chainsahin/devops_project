@@ -34,22 +34,6 @@ services:
       - web-app-blue
       - web-app-green
 
-  # 📊 cAdvisor (Monitoring) - KUBERNETES RESMİ YOLU
-  cadvisor:
-    # Google'ın (gcr.io) kısıtlı deposu yerine en güncel Kubernetes deposunu kullanıyoruz
-    image: registry.k8s.io/cadvisor/cadvisor:v0.49.1
-    container_name: cadvisor
-    privileged: true
-    ports:
-      - "8080:8080"
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-      - /dev/disk/:/dev/disk:ro
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-
   # 🗄️ Redis
   redis-server:
     image: "redis:alpine"
