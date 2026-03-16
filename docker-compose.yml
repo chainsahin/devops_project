@@ -34,11 +34,10 @@ services:
       - web-app-blue
       - web-app-green
 
-  # 📊 cAdvisor (Monitoring)
+  # 📊 cAdvisor (Monitoring) - KUBERNETES RESMİ YOLU
   cadvisor:
-    # Bu sefer resmi gcr.io yoluna dönüyoruz ama sunucudaki engeli aşmak için
-    # aşağıda sana özel bir "Force Pull" komutu vereceğim.
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    # Google'ın (gcr.io) kısıtlı deposu yerine en güncel Kubernetes deposunu kullanıyoruz
+    image: registry.k8s.io/cadvisor/cadvisor:v0.49.1
     container_name: cadvisor
     privileged: true
     ports:
