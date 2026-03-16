@@ -42,8 +42,8 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          # 'templates' klasörünü listeye ekledik
-          source: "docker-compose.yml,nginx.conf,Dockerfile,app.py,requirements.txt,templates"
+          # BURAYA prometheus.yml dosyasını ekledik 👇
+          source: "docker-compose.yml,nginx.conf,Dockerfile,app.py,requirements.txt,templates,prometheus.yml"
           target: "/root/devops_project"
 
       - name: Sunucuya SSH ile Bağlan ve Güncelle
