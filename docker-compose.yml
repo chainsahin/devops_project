@@ -2,6 +2,7 @@ services:
   # 🔵 Mavi Sürüm
   web-app-blue:
     image: ${DOCKERHUB_USERNAME}/devops_project:${GITHUB_RUN_NUMBER}
+    container_name: web-app-blue  # 👈 İsmi sabitledik
     ports:
       - "8081:5000"
     environment:
@@ -14,6 +15,7 @@ services:
   # 🟢 Yeşil Sürüm
   web-app-green:
     image: ${DOCKERHUB_USERNAME}/devops_project:${GITHUB_RUN_NUMBER}
+    container_name: web-app-green  # 👈 İsmi sabitledik
     ports:
       - "8082:5000"
     environment:
@@ -26,6 +28,7 @@ services:
   # 👮‍♂️ Nginx Load Balancer
   nginx:
     image: nginx:latest
+    container_name: nginx-lb
     ports:
       - "80:80"
     volumes:
@@ -34,9 +37,8 @@ services:
       - web-app-blue
       - web-app-green
 
-  # 📊 cAdvisor (Monitoring) - Sunucuda Hazır Olan İmaj
+  # 📊 cAdvisor (Monitoring)
   cadvisor:
-    # Az önce manuel olarak pull ettiğin imajı buraya yazdık
     image: google/cadvisor:latest
     container_name: cadvisor
     privileged: true
@@ -53,6 +55,7 @@ services:
   # 🗄️ Redis
   redis-server:
     image: "redis:alpine"
+    container_name: redis-server
     volumes:
       - redis_data:/data
 
